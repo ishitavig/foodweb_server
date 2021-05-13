@@ -51,8 +51,9 @@ class Users {
 
   static async searchRestaurants(req, res) {
     try {
+      console.log(process.env, "env");
       const result = await axios.post(
-        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${req.query.city}&type=restaurant&key=AIzaSyC08NYxxWNocIpjBBhG--OXi7LEnk7OvAk&radius=1000`
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${req.query.city}&type=restaurant&key=${process.env.GOOGLE_PLACES_API}&radius=1000`
       );
       if (result && result.data && result.data.results) {
         res.status(200).json(result.data.results);

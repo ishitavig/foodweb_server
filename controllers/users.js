@@ -1,6 +1,7 @@
 const knex = require("./../database");
 const passwordHash = require("password-hash");
 const jwt = require("jsonwebtoken");
+const { default: axios } = require("axios");
 
 class Users {
   static async signup(req, res) {
@@ -46,6 +47,19 @@ class Users {
         // Send a error message in response
         res.json({ message: `There was an error retrieving users: ${err}` });
       });
+  }
+
+  static async searchRestaurants(req, res) {
+    try {
+      const result = await axios.post(
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${req.query.city}&type=restaurant&key=AIzaSyC08NYxxWNocIpjBBhG--OXi7LEnk7OvAk&radius=1000`
+      );
+      if (result && result.data && result.data.results) {
+        res.status(200).json(result.data.results);
+      }
+    } catch (error) {
+      res.status(404).json(error);
+    }
   }
 }
 

@@ -166,72 +166,36 @@ knex.schema
     console.error(`There was an error setting up the database: ${error}`);
   });
 
-// Create a table in the database called "customerBlogs"
+// Create a table in the database called "blogs"
 knex.schema
-  // Make sure no "customerBlogs" table exists
+  // Make sure no "blogs" table exists
   // before trying to create new
-  .hasTable("customerBlogs")
+  .hasTable("blogs")
   .then((exists) => {
     if (!exists) {
-      // If no "customerBlogs" table exists
+      // If no "blogs" table exists
       // create new columns
-      // and use "customerBlogId" as a primary identification
-      // and increment "customerBlogId" with every new record (business)
+      // and use "blogId" as a primary identification
+      // and increment "blogId" with every new record (business)
       return knex.schema
-        .createTable("customerBlogs", (table) => {
-          table.increments("customerBlogId").primary();
+        .createTable("blogs", (table) => {
+          table.increments("blogId").primary();
           table
             .integer("customerId")
             .references("customerId")
             .inTable("customers");
-          table.string("heading");
-          table.string("text");
-          table.timestamp("postedOn");
-          table.integer("visibilityStatus");
-        })
-        .then(() => {
-          // Log success message
-          console.log("Table 'customerBlogs' created");
-        })
-        .catch((error) => {
-          console.error(`There was an error creating table: ${error}`);
-        });
-    }
-  })
-  .then(() => {
-    // Log success message
-    // console.log("done");
-  })
-  .catch((error) => {
-    console.error(`There was an error setting up the database: ${error}`);
-  });
-
-// Create a table in the database called "businessBlogs"
-knex.schema
-  // Make sure no "businessBlogs" table exists
-  // before trying to create new
-  .hasTable("businessBlogs")
-  .then((exists) => {
-    if (!exists) {
-      // If no "businessBlogs" table exists
-      // create new columns
-      // and use "businessBlogId" as a primary identification
-      // and increment "customerBlogId" with every new record (business)
-      return knex.schema
-        .createTable("businessBlogs", (table) => {
-          table.increments("businessBlogId").primary();
           table
             .integer("businessId")
             .references("businessId")
             .inTable("businesses");
           table.string("heading");
-          table.string("text");
+          table.string("content");
           table.timestamp("postedOn");
           table.integer("visibilityStatus");
         })
         .then(() => {
           // Log success message
-          console.log("Table 'businessBlogId' created");
+          console.log("Table 'blogs' created");
         })
         .catch((error) => {
           console.error(`There was an error creating table: ${error}`);

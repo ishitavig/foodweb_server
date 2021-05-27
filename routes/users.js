@@ -7,9 +7,13 @@ router.get("/", function (req, res, next) {
   res.json("respond with a resource");
 });
 
-router.post("/signup", Users.signup);
+router.post("/customer/signup", Users.customerSignUp);
 
-router.post("/signin", Users.signin);
+router.post("/customer/signin", Users.customerSignIn);
+
+router.post("/business/signup", Users.businessSignUp);
+
+router.post("/business/signin", Users.businessSignIn);
 
 router.post("/search-restaurants", Users.searchRestaurants);
 

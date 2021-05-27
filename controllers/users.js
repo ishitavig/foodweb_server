@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 const { default: axios } = require("axios");
 
 class Users {
-  static async signup(req, res) {
-    knex("users")
+  static async customerSignUp(req, res) {
+    knex("customers")
       .insert({
         // insert new record, a user
         name: req.body.name,
@@ -13,45 +13,98 @@ class Users {
         password: passwordHash.generate(req.body.password),
         mobile: req.body.mobile,
       })
-      .then(() => {
+      .then((re) => {
         // Send a success message in response
-        res.json({ name: req.body.name, email: req.body.email });
+        res.status(200).json({ name: req.body.name, email: req.body.email });
       })
       .catch((err) => {
         // Send a error message in response
-        res.json({
-          message: `There was an error creating user: ${req.body.name} with error: ${err}`,
+        res.status(500).json({
+          message: `There was an error creating customers: ${req.body.name} with error: ${err}`,
         });
       });
   }
 
-  static async signin(req, res) {
+  static async customerSignIn(req, res) {
     knex
       .select("*") // select all records
-      .from("users") // from 'users' table
+      .from("customers") // from 'users' table
       .where({ email: req.body.email })
       .then((userData) => {
+        const password = req.body && req.body.password ? req.body.password : "";
         // Send users extracted from database in response
         const verifyPassword = passwordHash.verify(
-          req.body.password,
+          password,
           userData[0].password
         );
         if (verifyPassword) {
-          const token = jwt.sign({ data: userData }, "secretcode");
+          const token = jwt.sign({ data: userData }, process.env.JWT_SIGN_CODE);
           res.json({ ...userData[0], token: token });
         } else {
-          res.json({ signin: false });
+          res.status(200).json({ signin: false });
         }
       })
       .catch((err) => {
         // Send a error message in response
-        res.json({ message: `There was an error retrieving users: ${err}` });
+        res
+          .status(500)
+          .json({ message: `There was an error retrieving customer: ${err}` });
+      });
+  }
+
+  static async businessSignUp(req, res) {
+    knex("businesses")
+      .insert({
+        // insert new record, a user
+        name: req.body.name,
+        email: req.body.email,
+        password: passwordHash.generate(req.body.password),
+        mobile: req.body.mobile,
+        abn: req.body.abn,
+        tableBookingStatus: req.body.tableBookingStatus,
+        foodOrderStatus: req.body.foodOrderStatus,
+      })
+      .then((re) => {
+        // Send a success message in response
+        res.status(200).json({ name: req.body.name, email: req.body.email });
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error creating business: ${req.body.name} with error: ${err}`,
+        });
+      });
+  }
+
+  static async businessSignIn(req, res) {
+    knex
+      .select("*") // select all records
+      .from("businesses") // from 'users' table
+      .where({ email: req.body.email })
+      .then((userData) => {
+        const password = req.body && req.body.password ? req.body.password : "";
+        // Send users extracted from database in response
+        const verifyPassword = passwordHash.verify(
+          password,
+          userData[0].password
+        );
+        if (verifyPassword) {
+          const token = jwt.sign({ data: userData }, process.env.JWT_SIGN_CODE);
+          res.json({ ...userData[0], token: token });
+        } else {
+          res.status(200).json({ signin: false });
+        }
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res
+          .status(500)
+          .json({ message: `There was an error retrieving business: ${err}` });
       });
   }
 
   static async searchRestaurants(req, res) {
     try {
-      console.log(process.env, "env");
       const result = await axios.post(
         `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${req.query.city}&type=restaurant&key=${process.env.GOOGLE_PLACES_API}&radius=1000`
       );
@@ -59,7 +112,7 @@ class Users {
         res.status(200).json(result.data.results);
       }
     } catch (error) {
-      res.status(404).json(error);
+      res.status(500).json(error);
     }
   }
 }

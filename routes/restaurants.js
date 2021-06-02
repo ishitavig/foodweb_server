@@ -4,4 +4,20 @@ var router = express.Router();
 
 router.get("/getAll", Restaurants.getAll);
 
+router.post(
+  "/tableBooking/:businessId/:customerId",
+  Restaurants.createTableBooking
+);
+
+router.post("/addMenuItem/:businessId", Restaurants.addMenuItem);
+
+router.put("/updateMenuItem/:businessId/:itemId", Restaurants.updateMenuItem);
+
+router.delete(
+  "/deleteMenuItem/:businessId/:itemId",
+  Restaurants.deleteMenuItem
+);
+
+router.get("/menu/:businessId/getAll", Restaurants.getMenu);
+
 module.exports = router;

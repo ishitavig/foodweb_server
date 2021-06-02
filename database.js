@@ -106,6 +106,10 @@ knex.schema
           table.integer("planId").references("planId").inTable("adPlans");
           table.integer("tableBookingStatus");
           table.integer("foodOrderStatus");
+          table.string("address");
+          table.timestamp("openingHoursFrom");
+          table.timestamp("openingHoursTo");
+          table.integer("rating");
         })
         .then(() => {
           // Log success message

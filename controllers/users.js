@@ -63,6 +63,9 @@ class Users {
         abn: req.body.abn,
         tableBookingStatus: req.body.tableBookingStatus,
         foodOrderStatus: req.body.foodOrderStatus,
+        address: req.body.address,
+        openingHoursFrom: req.body.openingHoursFrom,
+        openingHoursTo: req.body.openingHoursTo,
       })
       .then((re) => {
         // Send a success message in response

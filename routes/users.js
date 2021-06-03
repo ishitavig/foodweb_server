@@ -15,6 +15,10 @@ router.post("/business/signup", Users.businessSignUp);
 
 router.post("/business/signin", Users.businessSignIn);
 
+router.put("/business/:businessId", Users.updateBusiness);
+
+router.get("/business/:businessId", Users.getBusinessById);
+
 router.post("/search-restaurants", Users.searchRestaurants);
 
 module.exports = router;

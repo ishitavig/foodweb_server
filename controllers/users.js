@@ -106,6 +106,39 @@ class Users {
       });
   }
 
+  static async updateBusiness(req, res) {
+    knex("businesses")
+      .where({ businessId: req.params.businessId })
+      .update(req.body)
+      .then((re) => {
+        // Send a success message in response
+        res.status(200).json({});
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error creating business: ${req.body.name} with error: ${err}`,
+        });
+      });
+  }
+
+  static async getBusinessById(req, res) {
+    await knex
+      .select()
+      .from("businesses")
+      .where({ businessId: req.params.businessId })
+      .then((userData) => {
+        const token = jwt.sign({ data: userData }, process.env.JWT_SIGN_CODE);
+        res.json({ token: token });
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error creating business: ${req.body.name} with error: ${err}`,
+        });
+      });
+  }
+
   static async searchRestaurants(req, res) {
     try {
       const result = await axios.post(

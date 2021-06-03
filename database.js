@@ -64,6 +64,7 @@ knex.schema
           table.increments("planId").primary();
           table.string("name");
           table.integer("periodInDays");
+          table.integer("price");
           table.integer("status");
         })
         .then(() => {

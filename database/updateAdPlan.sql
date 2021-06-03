@@ -1,0 +1,1 @@
+update adPlans set name = 'Yearly' where planId = 3

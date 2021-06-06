@@ -27,4 +27,14 @@ router.post(
   Restaurants.createFoodOrder
 );
 
+router.get(
+  "/getTableBookings/:userType/:userId",
+  Restaurants.getTableBookingsForCustomer
+);
+
+router.get(
+  "/getFoodOrders/:userType/:userId",
+  Restaurants.getFoodOrdersForCustomer
+);
+
 module.exports = router;

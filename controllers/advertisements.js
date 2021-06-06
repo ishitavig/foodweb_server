@@ -13,7 +13,7 @@ class Advertisements {
       .insert({
         businessId: req.params.businessId,
         heading: req.body.heading,
-        text: req.body.content,
+        content: req.body.content,
         startDate: req.body.startDate || Date.now(),
         endDate: req.body.endDate || Date.now(),
         visibilityStatus: req.body.visibilityStatus,

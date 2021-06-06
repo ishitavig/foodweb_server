@@ -1,0 +1,1 @@
+update businesses set planId = null where businessId = 1

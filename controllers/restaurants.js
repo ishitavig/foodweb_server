@@ -48,16 +48,16 @@ class Restaurants {
     knex("foodMenu")
       .insert({
         businessId: req.params.businessId,
-        name: req.body.name,
+        itemName: req.body.name,
         price: req.body.price,
-        availabilityStatus: req.body.available,
+        availabilityStatus: req.body.availabilityStatus,
       })
       .then((re) => {
         // Send a success message in response
         res.status(200).json({
           name: req.body.name,
           price: req.body.price,
-          availabilityStatus: req.body.available,
+          availabilityStatus: req.body.availabilityStatus,
         });
       })
       .catch((err) => {
@@ -72,9 +72,9 @@ class Restaurants {
     knex("foodMenu")
       .where({ itemId: +req.params.itemId, businessId: +req.params.businessId })
       .update({
-        name: req.body.name,
+        itemName: req.body.name,
         price: req.body.price,
-        availabilityStatus: req.body.available,
+        availabilityStatus: req.body.availabilityStatus,
       })
       .then((re) => {
         // Send a success message in response
@@ -141,7 +141,6 @@ class Restaurants {
   }
 
   static async createFoodOrder(req, res) {
-    console.log(req.params, req.body.itemIds, "body");
     const totalCost = await knex
       .select("*")
       .from("foodMenu")
@@ -162,6 +161,7 @@ class Restaurants {
         billingCost: totalCost,
         address: req.body.address,
         mobile: req.body.mobile,
+        orderStatus: 1,
       })
       .then(async (result) => {
         req.body.itemIds
@@ -186,23 +186,74 @@ class Restaurants {
               .catch((e) => console.log(e, "error"));
           });
 
-        const stripeCustomer = await stripe.customers.create({
-          email: req.body.email,
-        });
+        const stripeCustomer = await stripe.customers
+          .create({
+            email: req.body.email,
+          })
+          .catch((e) => console.log(e, "customererror"));
 
-        const paymentIntent = await stripe.paymentIntents.create({
-          customer: stripeCustomer.customerId,
-          amount: totalCost,
-          currency: "aud",
-        });
+        const paymentIntent = await stripe.paymentIntents
+          .create({
+            customer: stripeCustomer.customerId,
+            amount: totalCost * 100,
+            currency: "aud",
+          })
+          .catch((e) => console.log(e, "paymentintenterror"));
         res.send({
           clientSecret: paymentIntent.client_secret,
         });
       })
       .catch((err) => {
+        console.log(err, "err");
         // Send a error message in response
         res.status(500).json({
           message: `There was an error adding food item: ${req.body.name} with error: ${err}`,
+        });
+      });
+  }
+
+  static async getTableBookingsForCustomer(req, res) {
+    knex
+      .select("*") // select all records
+      .from("tableBookings")
+      .join("businesses", "businesses.businessId", "tableBookings.businessId")
+      .where(
+        req.params.userType === "customer"
+          ? { customerId: req.params.userId, bookingStatus: 1 }
+          : { businessId: req.params.userId, bookingStatus: 1 }
+      )
+      .then((bookings) => {
+        res.status(200).json(bookings);
+      })
+      .catch((err) => {
+        console.log(err, "err");
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error retrieving table bookings: ${err}`,
+        });
+      });
+  }
+
+  static async getFoodOrdersForCustomer(req, res) {
+    knex
+      .select("*") // select all records
+      .from("foodOrders")
+      .join("itemOrders", "foodOrders.orderId", "itemOrders.orderId")
+      .join("foodMenu", "itemOrders.itemId", "foodMenu.itemId")
+      .join("businesses", "foodOrders.businessId", "businesses.businessId")
+      .where(
+        req.params.userType === "customer"
+          ? { customerId: req.params.userId, orderStatus: 1 }
+          : { businessId: req.params.userId, orderStatus: 1 }
+      )
+      .then((bookings) => {
+        res.status(200).json(bookings);
+      })
+      .catch((err) => {
+        console.log(err, "err");
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error retrieving table bookings: ${err}`,
         });
       });
   }

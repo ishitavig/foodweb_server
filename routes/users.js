@@ -15,9 +15,9 @@ router.post("/business/signup", Users.businessSignUp);
 
 router.post("/business/signin", Users.businessSignIn);
 
-router.put("/business/:businessId", Users.updateBusiness);
+router.put("/:userType/:userId", Users.updateUser);
 
-router.get("/business/:businessId", Users.getBusinessById);
+router.get("/:userType/:userId", Users.getUserById);
 
 router.post("/search-restaurants", Users.searchRestaurants);
 

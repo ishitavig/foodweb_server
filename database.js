@@ -148,7 +148,7 @@ knex.schema
             .references("businessId")
             .inTable("businesses");
           table.string("heading");
-          table.string("text");
+          table.string("content");
           table.timestamp("startDate");
           table.timestamp("endDate");
           table.integer("visibilityStatus");
@@ -273,7 +273,7 @@ knex.schema
       return knex.schema
         .createTable("foodMenu", (table) => {
           table.increments("itemId").primary();
-          table.string("name");
+          table.string("itemName");
           table
             .integer("businessId")
             .references("businessId")
@@ -323,6 +323,7 @@ knex.schema
           table.integer("billingCost");
           table.string("address");
           table.integer("mobile");
+          table.integer("orderStatus");
         })
         .then(() => {
           // Log success message
@@ -356,17 +357,8 @@ knex.schema
           table
             .increments("orderId")
             .references("orderId")
-            .inTable("foodOrders")
-            .notNullable()
-            .onDelete("CASCADE")
-            .index();
-          table
-            .integer("itemId")
-            .references("itemId")
-            .inTable("foodMenu")
-            .notNullable()
-            .onDelete("CASCADE")
-            .index();
+            .inTable("foodOrders");
+          table.integer("itemId").references("itemId").inTable("foodMenu");
           table.integer("quantity");
         })
         .then(() => {

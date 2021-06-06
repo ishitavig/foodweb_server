@@ -1,2 +1,2 @@
 -- SQLite
-insert into adPlans(name, periodInDays, status) VALUES('Year',31,1)
+insert into adPlans(name, periodInDays, price, status) VALUES('Yearly',365,500, 1)

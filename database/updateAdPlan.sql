@@ -1,1 +1,1 @@
-update adPlans set name = 'Yearly' where planId = 3
+update adPlans set price = 10 where planId = 3

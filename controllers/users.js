@@ -33,6 +33,9 @@ class Users {
       .from("customers") // from 'users' table
       .where({ email: req.body.email })
       .then((userData) => {
+        if (userData.length === 0) {
+          return res.status(200).json({ signin: false });
+        }
         const password = req.body && req.body.password ? req.body.password : "";
         // Send users extracted from database in response
         const verifyPassword = passwordHash.verify(
@@ -41,14 +44,14 @@ class Users {
         );
         if (verifyPassword) {
           const token = jwt.sign({ data: userData }, process.env.JWT_SIGN_CODE);
-          res.json({ ...userData[0], token: token });
+          return res.json({ ...userData[0], token: token });
         } else {
-          res.status(200).json({ signin: false });
+          return res.status(200).json({ signin: false });
         }
       })
       .catch((err) => {
         // Send a error message in response
-        res
+        return res
           .status(500)
           .json({ message: `There was an error retrieving customer: ${err}` });
       });
@@ -108,9 +111,15 @@ class Users {
       });
   }
 
-  static async updateBusiness(req, res) {
-    knex("businesses")
-      .where({ businessId: req.params.businessId })
+  static async updateUser(req, res) {
+    delete req.body.customerId;
+    delete req.body.businessId;
+    knex(req.params.userType === "customer" ? "customers" : "businesses")
+      .where(
+        req.params.userType === "customer"
+          ? { customerId: req.params.userId }
+          : { businessId: req.params.userId }
+      )
       .update(req.body)
       .then((re) => {
         // Send a success message in response
@@ -124,11 +133,15 @@ class Users {
       });
   }
 
-  static async getBusinessById(req, res) {
+  static async getUserById(req, res) {
     await knex
       .select()
-      .from("businesses")
-      .where({ businessId: req.params.businessId })
+      .from(req.params.userType === "customer" ? "customers" : "businesses")
+      .where(
+        req.params.userType === "customer"
+          ? { customerId: req.params.userId }
+          : { businessId: req.params.userId }
+      )
       .then((userData) => {
         const token = jwt.sign({ data: userData }, process.env.JWT_SIGN_CODE);
         res.json({ token: token });

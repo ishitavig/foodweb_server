@@ -212,7 +212,7 @@ class Restaurants {
       });
   }
 
-  static async getTableBookingsForCustomer(req, res) {
+  static async getTableBookings(req, res) {
     knex
       .select("*") // select all records
       .from("tableBookings")
@@ -220,7 +220,7 @@ class Restaurants {
       .where(
         req.params.userType === "customer"
           ? { customerId: req.params.userId, bookingStatus: 1 }
-          : { businessId: req.params.userId, bookingStatus: 1 }
+          : { "businesses.businessId": req.params.userId, bookingStatus: 1 }
       )
       .then((bookings) => {
         res.status(200).json(bookings);
@@ -234,7 +234,7 @@ class Restaurants {
       });
   }
 
-  static async getFoodOrdersForCustomer(req, res) {
+  static async getFoodOrders(req, res) {
     knex
       .select("*") // select all records
       .from("foodOrders")
@@ -244,7 +244,7 @@ class Restaurants {
       .where(
         req.params.userType === "customer"
           ? { customerId: req.params.userId, orderStatus: 1 }
-          : { businessId: req.params.userId, orderStatus: 1 }
+          : { "businesses.businessId": req.params.userId, orderStatus: 1 }
       )
       .then((bookings) => {
         res.status(200).json(bookings);

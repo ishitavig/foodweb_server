@@ -356,9 +356,18 @@ knex.schema
           table
             .increments("orderId")
             .references("orderId")
-            .inTable("foodOrders");
-          table.integer("itemId").references("itemId").inTable("foodMenu");
-          table.unique(["orderId", "itemId"]);
+            .inTable("foodOrders")
+            .notNullable()
+            .onDelete("CASCADE")
+            .index();
+          table
+            .integer("itemId")
+            .references("itemId")
+            .inTable("foodMenu")
+            .notNullable()
+            .onDelete("CASCADE")
+            .index();
+          table.integer("quantity");
         })
         .then(() => {
           // Log success message

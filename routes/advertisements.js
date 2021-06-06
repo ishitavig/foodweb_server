@@ -17,4 +17,6 @@ router.put("/update/:businessId/:adId", Advertisements.update);
 
 router.delete("/delete/:businessId/:adId", Advertisements.delete);
 
+router.get("/getAllAds", Advertisements.getAllAds);
+
 module.exports = router;

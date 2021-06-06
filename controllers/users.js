@@ -2,6 +2,8 @@ const knex = require("./../database");
 const passwordHash = require("password-hash");
 const jwt = require("jsonwebtoken");
 const { default: axios } = require("axios");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_SECRET_KEY);
 
 class Users {
   static async customerSignUp(req, res) {
@@ -150,6 +152,72 @@ class Users {
     } catch (error) {
       res.status(500).json(error);
     }
+  }
+
+  static async forgotPasswordEmail(req, res) {
+    await knex
+      .select()
+      .from(req.params.userType === "customer" ? "customers" : "businesses")
+      .where({ email: req.body.email })
+      .then((userData) => {
+        if (Object.keys(userData[0]).length !== 0) {
+          const token = jwt.sign(
+            {
+              email: userData[0].email,
+              isCustomer: userData[0].customerId ? 1 : 0,
+            },
+            process.env.JWT_SIGN_CODE
+          );
+          const msg = {
+            to: userData[0].email,
+            from: "ishitavig@gmail.com",
+            subject: "Forgot Password? FoodWeb",
+            html: `You requested to reset your password. If it wasn't you, please contact support immediately. 
+            <a href="http://www.localhost:3000/resetPassword/${token}">Click here to reset your password.</a>`,
+          };
+
+          sgMail.send(msg).then(
+            () => {
+              res.status(200).json({});
+            },
+            (error) => {
+              console.error(error, "error sending email");
+
+              if (error.response) {
+                console.error(error.response.body);
+              }
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res.status(500).json({
+          message: `There was an error creating business: ${req.body} with error: ${err}`,
+        });
+      });
+  }
+
+  static async resetPassword(req, res) {
+    const passwordsMatch = req.body.password === req.body.confirmPassword;
+
+    passwordsMatch
+      ? knex(req.params.userType === "customer" ? "customers" : "businesses")
+          .where({ email: req.body.userEmail })
+          .update({
+            password: passwordHash.generate(req.body.password),
+          })
+          .then((re) => {
+            // Send a success message in response
+            res.status(200).json({});
+          })
+          .catch((err) => {
+            // Send a error message in response
+            res.status(500).json({
+              message: `There was an error updating password: ${req.body} with error: ${err}`,
+            });
+          })
+      : res.status(401).json({});
   }
 }
 

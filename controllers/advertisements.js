@@ -98,8 +98,6 @@ class Advertisements {
         expand: ["latest_invoice.payment_intent"],
       });
 
-      console.log(req.params, req.body, "body");
-
       knex("businesses")
         .where({ email: req.body.email })
         .update({ planId: +req.params.planId, billingId: subscription.id })
@@ -111,7 +109,6 @@ class Advertisements {
           });
         });
     } catch (err) {
-      console.log(err, "err");
       res.status(400);
       return res.send({
         error: {
@@ -133,6 +130,21 @@ class Advertisements {
         res
           .status(500)
           .json({ message: `There was an error retrieving ad plans: ${err}` });
+      });
+  }
+
+  static async getAllAds(req, res) {
+    knex
+      .select("*") // select all records
+      .from("businessAds") // from 'businessAds' table
+      .then((adData) => {
+        res.json(adData);
+      })
+      .catch((err) => {
+        // Send a error message in response
+        res
+          .status(500)
+          .json({ message: `There was an error retrieving ads: ${err}` });
       });
   }
 }

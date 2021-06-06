@@ -21,4 +21,8 @@ router.get("/business/:businessId", Users.getBusinessById);
 
 router.post("/search-restaurants", Users.searchRestaurants);
 
+router.post("/:userType/forgotPassword", Users.forgotPasswordEmail);
+
+router.put("/:userType/resetPassword", Users.resetPassword);
+
 module.exports = router;

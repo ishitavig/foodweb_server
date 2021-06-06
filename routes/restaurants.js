@@ -20,4 +20,11 @@ router.delete(
 
 router.get("/menu/:businessId/getAll", Restaurants.getMenu);
 
+router.get("/getAvailableMenu/:businessId", Restaurants.getAvailableMenu);
+
+router.post(
+  "/createFoodOrder/:businessId/:customerId",
+  Restaurants.createFoodOrder
+);
+
 module.exports = router;

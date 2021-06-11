@@ -48,14 +48,14 @@ class Restaurants {
     knex("foodMenu")
       .insert({
         businessId: req.params.businessId,
-        itemName: req.body.name,
+        itemName: req.body.itemName,
         price: req.body.price,
         availabilityStatus: req.body.availabilityStatus,
       })
       .then((re) => {
         // Send a success message in response
         res.status(200).json({
-          name: req.body.name,
+          itemName: req.body.itemName,
           price: req.body.price,
           availabilityStatus: req.body.availabilityStatus,
         });
@@ -63,7 +63,7 @@ class Restaurants {
       .catch((err) => {
         // Send a error message in response
         res.status(500).json({
-          message: `There was an error adding food item: ${req.body.name} with error: ${err}`,
+          message: `There was an error adding food item: ${req.body.itemName} with error: ${err}`,
         });
       });
   }
@@ -72,14 +72,14 @@ class Restaurants {
     knex("foodMenu")
       .where({ itemId: +req.params.itemId, businessId: +req.params.businessId })
       .update({
-        itemName: req.body.name,
+        itemName: req.body.itemName,
         price: req.body.price,
         availabilityStatus: req.body.availabilityStatus,
       })
       .then((re) => {
         // Send a success message in response
         res.status(200).json({
-          name: req.body.name,
+          name: req.body.itemName,
           price: req.body.price,
           availabilityStatus: req.body.available,
         });
@@ -87,7 +87,7 @@ class Restaurants {
       .catch((err) => {
         // Send a error message in response
         res.status(500).json({
-          message: `There was an error updating food item: ${req.body.name} with error: ${err}`,
+          message: `There was an error updating food item: ${req.body.itemName} with error: ${err}`,
         });
       });
   }
@@ -153,12 +153,13 @@ class Restaurants {
         );
         return prices.reduce((a, b) => a + b, 0);
       });
+    const bill = parseFloat(totalCost).toFixed(2) * 100;
 
     knex("foodOrders")
       .insert({
         businessId: req.params.businessId,
         customerId: req.params.customerId,
-        billingCost: totalCost,
+        billingCost: bill,
         address: req.body.address,
         mobile: req.body.mobile,
         orderStatus: 1,
@@ -169,14 +170,6 @@ class Restaurants {
             return req.body.itemIds.indexOf(data) === index;
           })
           .map((itemId) => {
-            console.log(
-              {
-                orderId: result[0],
-                itemId: itemId,
-                quantity: req.body.itemIds.filter((i) => +i === +itemId).length,
-              },
-              "this"
-            );
             knex("itemOrders")
               .insert({
                 orderId: result[0],

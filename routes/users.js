@@ -23,6 +23,6 @@ router.post("/search-restaurants", Users.searchRestaurants);
 
 router.post("/:userType/forgotPassword", Users.forgotPasswordEmail);
 
-router.put("/:userType/resetPassword", Users.resetPassword);
+router.post("/:userType/resetPassword", Users.resetPassword);
 
 module.exports = router;

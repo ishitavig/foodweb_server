@@ -30,8 +30,30 @@ class Blogs {
     knex
       .select("*") // select all records
       .from("blogs") // from 'blogs' table
-      .then((blogData) => {
-        res.json(blogData);
+      .then(async (blogData) => {
+        let updatedData = blogData;
+        if (blogData.length !== 0) {
+          updatedData = await Promise.all(
+            blogData.map((blog) => {
+              return knex
+                .select("*")
+                .from(+blog.customerId !== 0 ? "customers" : "businesses")
+                .where(
+                  +blog.customerId !== 0
+                    ? { customerId: blog.customerId }
+                    : { businessId: blog.businessId }
+                )
+                .then((user) => {
+                  return {
+                    ...blog,
+                    ...user[0],
+                    isCustomer: +blog.customerId !== 0,
+                  };
+                });
+            })
+          );
+        }
+        res.json(updatedData);
       })
       .catch((err) => {
         // Send a error message in response

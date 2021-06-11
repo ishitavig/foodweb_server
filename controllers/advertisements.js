@@ -1,3 +1,4 @@
+const moment = require("moment");
 const knex = require("./../database");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -137,8 +138,14 @@ class Advertisements {
     knex
       .select("*") // select all records
       .from("businessAds") // from 'businessAds' table
+      .where({ visibilityStatus: 1 })
       .then((adData) => {
-        res.json(adData);
+        const filterAds = adData.filter(
+          (ad) =>
+            moment(ad.startDate).isBefore(moment()) &&
+            moment(ad.endDate).isAfter(moment())
+        );
+        res.json(filterAds);
       })
       .catch((err) => {
         // Send a error message in response

@@ -186,7 +186,11 @@ class Users {
             from: "ishitavig@gmail.com",
             subject: "Forgot Password? FoodWeb",
             html: `You requested to reset your password. If it wasn't you, please contact support immediately. 
-            <a href="http://www.localhost:3000/resetPassword/${token}">Click here to reset your password.</a>`,
+            <a href="${
+              process.env.NODE_ENV === "production"
+                ? "https://foodweb.vercel.app"
+                : "http://localhost:3000"
+            }/${token}">Click here to reset your password.</a>`,
           };
 
           sgMail.send(msg).then(
@@ -212,25 +216,29 @@ class Users {
   }
 
   static async resetPassword(req, res) {
-    const passwordsMatch = req.body.password === req.body.confirmPassword;
+    try {
+      const passwordsMatch = req.body.password === req.body.confirmPassword;
 
-    passwordsMatch
-      ? knex(req.params.userType === "customer" ? "customers" : "businesses")
-          .where({ email: req.body.userEmail })
-          .update({
-            password: passwordHash.generate(req.body.password),
-          })
-          .then((re) => {
-            // Send a success message in response
-            res.status(200).json({});
-          })
-          .catch((err) => {
-            // Send a error message in response
-            res.status(500).json({
-              message: `There was an error updating password: ${req.body} with error: ${err}`,
-            });
-          })
-      : res.status(401).json({});
+      passwordsMatch
+        ? knex(req.params.userType === "customer" ? "customers" : "businesses")
+            .where({ email: req.body.userEmail })
+            .update({
+              password: passwordHash.generate(req.body.password),
+            })
+            .then((re) => {
+              // Send a success message in response
+              res.status(200).json({});
+            })
+            .catch((err) => {
+              // Send a error message in response
+              res.status(500).json({
+                message: `There was an error updating password: ${req.body} with error: ${err}`,
+              });
+            })
+        : res.status(401).json({});
+    } catch (err) {
+      console.log(err, "err");
+    }
   }
 }
 
